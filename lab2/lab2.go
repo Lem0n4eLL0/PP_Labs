@@ -19,7 +19,7 @@ func first() {
 	var num int64
 	fmt.Print("Enter a number: ")
 	fmt.Scanf("%d\n", &num)
-	fmt.Println("First task:")
+	fmt.Println("First task")
 	fmt.Print(num, " is ")
 	if num%2 == 0 {
 		fmt.Println("even")
@@ -29,7 +29,7 @@ func first() {
 }
 
 func second() {
-	fmt.Println("__________\nSecond task:")
+	fmt.Println("__________\nSecond task")
 	fmt.Println("52 is ", numState(52))
 	fmt.Println("-52 is ", numState(-52))
 	fmt.Println("0 is ", numState(0))
@@ -47,7 +47,7 @@ func numState(num float64) string {
 }
 
 func third() {
-	fmt.Println("__________\nThird task:")
+	fmt.Println("__________\nThird task")
 	for i := 1; i <= 10; i++ {
 		fmt.Print(i, " ")
 	}
@@ -55,7 +55,7 @@ func third() {
 }
 
 func fourth() {
-	fmt.Println("_________\nFourth task:")
+	fmt.Println("_________\nFourth task")
 	fmt.Println("line size 'string' is: ", strLenth("string"))
 }
 
@@ -64,7 +64,7 @@ func strLenth(str string) int64 {
 }
 
 func fifth() {
-	fmt.Println("_________\nFifth task:")
+	fmt.Println("_________\nFifth task")
 	var rectangle Rectangle = Rectangle{52, 34}
 	fmt.Println("The area of the rectangle")
 	rectangle.display()
@@ -76,7 +76,7 @@ func (r Rectangle) square() float64 {
 }
 
 func sixth() {
-	fmt.Println("_________\nSixth task:")
+	fmt.Println("_________\nSixth task")
 	fmt.Println("average 3 and 4 is: ", average(3, 4))
 }
 

@@ -12,3 +12,13 @@ func Reversestring(str string) string {
 	}
 	return sb.String()
 }
+
+func StringBuilder(str ...[]string) string {
+	sb := strings.Builder{}
+	for _, s := range str {
+		for _, ss := range s {
+			sb.WriteString(ss + "\n")
+		}
+	}
+	return sb.String()
+}

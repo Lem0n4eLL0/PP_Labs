@@ -16,7 +16,7 @@ func Init() {
 }
 
 func first() {
-	fmt.Println("First task:\n", time.Now())
+	fmt.Println("First task\n", time.Now())
 }
 
 func second() {
@@ -24,7 +24,7 @@ func second() {
 	var f float64 = 0.0
 	var s string = "0"
 	var b bool = true
-	fmt.Println("__________\nSecond task:\nint: ", i, "\nfloat64: ", f, "\nstring: ", s, "\nbool: ", b)
+	fmt.Println("__________\nSecond task\nint: ", i, "\nfloat64: ", f, "\nstring: ", s, "\nbool: ", b)
 }
 
 func third() {
@@ -32,11 +32,11 @@ func third() {
 	f := 0.0
 	s := "0"
 	b := true
-	fmt.Println("__________\nThird task:\nint: ", i, "\nfloat64: ", f, "\nstring: ", s, "\nbool: ", b)
+	fmt.Println("__________\nThird task\nint: ", i, "\nfloat64: ", f, "\nstring: ", s, "\nbool: ", b)
 }
 
 func fourth() {
-	fmt.Println("_________\nFourth task:")
+	fmt.Println("_________\nFourth task")
 	operations(34, 52)
 }
 
@@ -49,7 +49,7 @@ func operations(num1 int, num2 int) {
 }
 
 func fifth() {
-	fmt.Println("_________\nFifth task:")
+	fmt.Println("_________\nFifth task")
 	fmt.Println("34.34 + 52 = ", oper(34.34, 52, add))
 	fmt.Println("34.34 - 52.52 = ", oper(34.34, 52.52, dif))
 }
@@ -67,7 +67,7 @@ func dif(num1 float64, num2 float64) float64 {
 }
 
 func sixth() {
-	fmt.Println("_________\nSixth task:")
+	fmt.Println("_________\nSixth task")
 	fmt.Println("average: 52 | 34.34 | 76.9\n", average(52, 34.34, 76.9))
 }
 
