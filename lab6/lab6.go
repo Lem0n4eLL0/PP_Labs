@@ -2,8 +2,11 @@ package lab6
 
 import (
 	"PP_LABS/utils/mathutils"
+	"PP_LABS/utils/stringutils"
+	"bufio"
 	"fmt"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 )
@@ -12,9 +15,10 @@ func Init() {
 	fmt.Println("Lab 6")
 	task1()
 	task2()
-	//task3()
+	task3()
 	task4()
 	task5()
+	task6()
 }
 
 func task1() {
@@ -75,31 +79,40 @@ func task2() {
 func task3() {
 	displayBorder()
 	fmt.Println("Third task")
-	intCh := make(chan int)
-	stringCh := make(chan string)
+	numChl := make(chan int)
+	strCh := make(chan string)
 
 	go func() {
-		defer close(intCh)
-		for i := 0; i < 1; i++ {
-			intCh <- rand.Intn(10) + 1
+		for i := 0; i < 10; i++ {
+			numChl <- rand.Intn(10) + 1
+			time.Sleep(time.Millisecond)
+		}
+		close(numChl)
+	}()
+
+	go func() {
+		for {
+			num := <-numChl
+			if num%2 == 0 {
+				strCh <- fmt.Sprintf("%d: even", num)
+			} else {
+				strCh <- fmt.Sprintf("%d: odd", num)
+			}
 		}
 	}()
 
-	for i := 0; i < 10; i++ {
+	for {
 		select {
-		case res := <-intCh:
-			numParity(res, stringCh)
-		case res := <-stringCh:
-			fmt.Println("Res: ", res)
+		case _, ok := <-numChl:
+			if !ok {
+				return
+			}
+		case parity, ok := <-strCh:
+			if !ok {
+				return
+			}
+			fmt.Println(parity)
 		}
-	}
-}
-
-func numParity(num int, ch chan string) {
-	if num%2 == 0 {
-		ch <- "even"
-	} else {
-		ch <- "add"
 	}
 }
 
@@ -128,32 +141,129 @@ func chageCounter(n int, m *sync.Mutex, wg *sync.WaitGroup) {
 	m.Unlock()
 }
 
+type calcParametr struct {
+	id      int
+	operand rune
+	num1    float64
+	num2    float64
+	op      func(float64, float64) float64
+}
+
+func (c *calcParametr) Display() {
+	fmt.Println("id: ", c.id, " | ", c.num1, string(c.operand), c.num2)
+}
+
+type calcResult struct {
+	id  int
+	res float64
+}
+
+func (c *calcResult) Display() {
+	fmt.Println("id:", c.id, " | res: ", c.res)
+}
+
 func task5() {
+	displayBorder()
+	fmt.Println("Fifth task")
 	numOp := 5
 	wg := sync.WaitGroup{}
 	wg.Add(numOp)
+	res := make(chan *calcResult)
+	par := make(chan *calcParametr)
+	taskArr := []calcParametr{}
 	for i := 0; i < numOp; i++ {
-		go taskCalc()
+		taskArr = append(taskArr, *taskCreater(i))
+	}
+	for _, i := range taskArr {
+		i.Display()
+	}
+	for i := 0; i < numOp; i++ {
+		go func() {
+			par <- &taskArr[i]
+		}()
+	}
+	go func() {
+		for i := 0; i < numOp; i++ {
+			calculator(res, par, &wg)
+		}
+	}()
+	for i := 0; i < numOp; i++ {
+		(<-res).Display()
 	}
 	wg.Wait()
 }
-func taskCalc() {
+
+func taskCreater(id int) *calcParametr {
 	randOp := rand.Intn(4) + 1
-	//randNum1 := rand.Intn(100) + 1
-	//randNum2 := rand.Intn(100) + 1
+	randNum1 := rand.Intn(100) + 1
+	randNum2 := rand.Intn(100) + 1
 	switch randOp {
 	case 1:
-		//calculator()
+		return &calcParametr{id, '+', float64(randNum1), float64(randNum2), func(f1, f2 float64) float64 { return f1 + f2 }}
 	case 2:
+		return &calcParametr{id, '-', float64(randNum1), float64(randNum2), func(f1, f2 float64) float64 { return f1 - f2 }}
 	case 3:
+		return &calcParametr{id, '*', float64(randNum1), float64(randNum2), func(f1, f2 float64) float64 { return f1 * f2 }}
 	case 4:
+		return &calcParametr{id, '/', float64(randNum1), float64(randNum2), func(f1, f2 float64) float64 { return f1 / f2 }}
 	}
-
+	return &calcParametr{id, '+', 1.0, 1.0, func(f1, f2 float64) float64 { return f1 + f2 }}
 }
 
-func calculator(res chan<- float64, task <-chan func(float64, float64) float64, wg *sync.WaitGroup) {
+func calculator(res chan<- *calcResult, task <-chan *calcParametr, wg *sync.WaitGroup) {
 	defer wg.Done()
-	res <- (<-task)(1, 2)
+	c := <-task
+	res <- &calcResult{c.id, c.op(c.num1, c.num2)}
+}
+
+func task6() {
+	displayBorder()
+	fmt.Println("Sixth task")
+	file, err := os.Open("lab6_norm.txt")
+	file2, err2 := os.OpenFile("lab6_rev.txt", os.O_WRONLY, 0666)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	if err2 != nil {
+		fmt.Println(err2)
+		os.Exit(1)
+	}
+	defer file.Close()
+	defer file2.Close()
+	var workers int = 0
+	fmt.Println("Entered num of workers:")
+	fmt.Fscan(os.Stdin, &workers)
+	writeReverse(file, file2, workers)
+}
+
+func writeReverse(base *os.File, rev *os.File, workers int) {
+	wg := sync.WaitGroup{}
+	str := make(chan string, 100)
+	res := make(chan string, 100)
+
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go work(str, res, &wg, i)
+
+	}
+	scanner := bufio.NewScanner(base)
+	for scanner.Scan() {
+		str <- scanner.Text()
+	}
+	close(str)
+	wg.Wait()
+	close(res)
+	for result := range res {
+		rev.WriteString(result + "\n")
+	}
+}
+
+func work(str <-chan string, rev chan<- string, wg *sync.WaitGroup, n int) {
+	defer wg.Done()
+	for s := range str {
+		rev <- stringutils.Reversestring(s)
+	}
 }
 
 func displayBorder() {

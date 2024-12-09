@@ -2,4 +2,8 @@ module PP_LABS
 
 go 1.23.1
 
-require gonum.org/v1/gonum v0.15.1 // indirect
+require (
+	github.com/gorilla/mux v1.8.1 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
+	gonum.org/v1/gonum v0.15.1 // indirect
+)
